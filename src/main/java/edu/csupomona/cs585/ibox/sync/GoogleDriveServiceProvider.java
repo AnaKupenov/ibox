@@ -3,7 +3,9 @@ package edu.csupomona.cs585.ibox.sync;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.Collections;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -17,10 +19,9 @@ import com.google.api.services.drive.DriveScopes;
 
 public class GoogleDriveServiceProvider {
 
-	private static String CLIENT_ID = "PASTE_YOUR_CLIENT_ID_HERE";
-	private static String CLIENT_SECRET = "PASTE_YOUR_CLIENT_SECRET_HERE";
-
-	private static String REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
+	//private static String CLIENT_ID = "944745764371-u5m0jt8c9eb7gutkj6l5ojrnm1c298hs.apps.googleusercontent.com";
+	//private static String CLIENT_SECRET = "...";
+	//private static String REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
 
 	private static GoogleDriveServiceProvider INSTANCE;
 	private Drive googleDriveClient;
@@ -41,10 +42,33 @@ public class GoogleDriveServiceProvider {
 		return INSTANCE;
 	}
 
+	
+	
+	public void initGoogleDriveServices() throws IOException {
+        HttpTransport httpTransport = new NetHttpTransport();
+        JsonFactory jsonFactory = new JacksonFactory();
+
+        try{
+            GoogleCredential credential = new  GoogleCredential.Builder()
+              .setTransport(httpTransport)
+              .setJsonFactory(jsonFactory)
+              .setServiceAccountId("...")
+              .setServiceAccountScopes(Collections.singleton(DriveScopes.DRIVE))
+              .setServiceAccountPrivateKeyFromP12File(new java.io.File("..."))
+              .build();
+
+            googleDriveClient = new Drive.Builder(httpTransport, jsonFactory, credential).setApplicationName("ibox").build();
+        }catch(GeneralSecurityException e){
+            e.printStackTrace();
+        }
+
+    }
+    
+/*
 	public void initGoogleDriveServices() throws IOException {
 		HttpTransport httpTransport = new NetHttpTransport();
 		JsonFactory jsonFactory = new JacksonFactory();
-
+		
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
 				httpTransport, jsonFactory, CLIENT_ID, CLIENT_SECRET, Arrays.asList(DriveScopes.DRIVE))
 		.setAccessType("online")
@@ -63,6 +87,8 @@ public class GoogleDriveServiceProvider {
 		googleDriveClient = new Drive.Builder(httpTransport, jsonFactory, credential).build();
 	}
 
+	*/		
+	
 	public Drive getGoogleDriveClient() {
 		return googleDriveClient;
 	}

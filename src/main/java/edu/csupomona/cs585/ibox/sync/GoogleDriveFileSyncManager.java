@@ -9,7 +9,6 @@ import com.google.api.services.drive.Drive.Files.List;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 
-
 public class GoogleDriveFileSyncManager implements FileSyncManager {
 
 	//Google Drive service
